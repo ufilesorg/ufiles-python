@@ -1,4 +1,4 @@
-from .async_ufiles import AsyncUssoSession
+from .async_ufiles import AsyncUFiles
 from .schemas import UFileItem
 from .ufiles import UFiles
 

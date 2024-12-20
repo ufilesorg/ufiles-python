@@ -9,7 +9,7 @@ from usso.session import AsyncUssoSession
 from .schemas import UFileItem
 
 
-class UFiles(AsyncUssoSession, metaclass=singleton.Singleton):
+class AsyncUFiles(AsyncUssoSession, metaclass=singleton.Singleton):
     def __init__(
         self,
         ufiles_base_url: str = os.getenv("UFILES_URL", "https://media.pixiee.io/v1/f"),
