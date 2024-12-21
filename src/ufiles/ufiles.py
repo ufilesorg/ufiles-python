@@ -19,14 +19,15 @@ class UFiles(UssoSession, metaclass=singleton.Singleton):
         usso_refresh_url: str | None = os.getenv("USSO_REFRESH_URL"),
         refresh_token: str | None = os.getenv("USSO_REFRESH_TOKEN"),
     ):
-        self.base_url = ufiles_base_url
-        self.upload_url = f"{self.base_url}/upload"
         UssoSession.__init__(
+            self,
             usso_base_url=usso_base_url,
             api_key=api_key,
             usso_refresh_url=usso_refresh_url,
             refresh_token=refresh_token,
         )
+        self.base_url = ufiles_base_url
+        self.upload_url = f"{self.base_url}/upload"
 
     def upload_file(self, filepath: Path, **kwargs) -> UFileItem:
         if not filepath.exists():
