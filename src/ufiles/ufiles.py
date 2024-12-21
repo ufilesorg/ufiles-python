@@ -28,8 +28,8 @@ class UFiles(UssoSession, metaclass=singleton.Singleton):
         )
         if ufiles_base_url.endswith("/"):
             ufiles_base_url = ufiles_base_url[:-1]
-        self.base_url = ufiles_base_url
-        self.upload_url = f"{self.base_url}/upload"
+        self.ufiles_base_url = ufiles_base_url
+        self.upload_url = f"{self.ufiles_base_url}/upload"
 
     def upload_file(self, filepath: Path, **kwargs) -> UFileItem:
         if not filepath.exists():
@@ -61,7 +61,7 @@ class UFiles(UssoSession, metaclass=singleton.Singleton):
     ) -> list[UFileItem]:
         def get_page(offset, limit=20):
             params = {"parent_id": parent_id, "offset": offset, "limit": limit}
-            response = self.get(self.base_url, params=params)
+            response = self.get(self.ufiles_base_url, params=params)
             response.raise_for_status()
             return [UFileItem(**item) for item in response.json().get("items")]
 
@@ -77,6 +77,6 @@ class UFiles(UssoSession, metaclass=singleton.Singleton):
         return items
 
     def delete_file(self, uid: str) -> UFileItem:
-        response = self.delete(f"{self.base_url}/{uid}")
+        response = self.delete(f"{self.ufiles_base_url}/{uid}")
         response.raise_for_status()
         return response.json()

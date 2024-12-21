@@ -28,8 +28,8 @@ class AsyncUFiles(AsyncUssoSession, metaclass=singleton.Singleton):
         )
         if ufiles_base_url.endswith("/"):
             ufiles_base_url = ufiles_base_url[:-1]
-        self.base_url = ufiles_base_url
-        self.upload_url = f"{self.base_url}/upload"
+        self.ufiles_base_url = ufiles_base_url
+        self.upload_url = f"{self.ufiles_base_url}/upload"
 
     async def upload_file(self, filepath: Path, **kwargs) -> UFileItem:
         if not filepath.exists():
@@ -61,7 +61,7 @@ class AsyncUFiles(AsyncUssoSession, metaclass=singleton.Singleton):
     ) -> list[UFileItem]:
         async def get_page(offset, limit=20):
             params = {"parent_id": parent_id, "offset": offset, "limit": limit}
-            response = await self.get(self.base_url, params=params)
+            response = await self.get(self.ufiles_base_url, params=params)
             response.raise_for_status()
             return [UFileItem(**item) for item in response.json().get("items")]
 
@@ -77,6 +77,6 @@ class AsyncUFiles(AsyncUssoSession, metaclass=singleton.Singleton):
         return items
 
     async def delete_file(self, uid: str) -> UFileItem:
-        response = await self.delete(f"{self.base_url}/{uid}")
+        response = await self.delete(f"{self.ufiles_base_url}/{uid}")
         response.raise_for_status()
         return response.json()
