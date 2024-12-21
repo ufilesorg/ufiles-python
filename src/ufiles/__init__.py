@@ -1,5 +1,5 @@
 from .async_ufiles import AsyncUFiles
-from .schemas import UFileItem
+from .schemas import UFileItem, PermissionEnum, PermissionSchema
 from .ufiles import UFiles
 
-__all__ = ["UFiles", "AsyncUssoSession", "UFileItem"]
+__all__ = ["UFiles", "AsyncUFiles", "UFileItem", "PermissionEnum", "PermissionSchema"]
