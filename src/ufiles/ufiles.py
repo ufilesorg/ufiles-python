@@ -26,6 +26,8 @@ class UFiles(UssoSession, metaclass=singleton.Singleton):
             usso_refresh_url=usso_refresh_url,
             refresh_token=refresh_token,
         )
+        if ufiles_base_url.endswith("/"):
+            ufiles_base_url = ufiles_base_url[:-1]
         self.base_url = ufiles_base_url
         self.upload_url = f"{self.base_url}/upload"
 
