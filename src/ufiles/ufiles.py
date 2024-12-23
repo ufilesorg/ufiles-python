@@ -10,14 +10,16 @@ from .schemas import UFileItem
 
 
 class UFiles(UssoSession, metaclass=singleton.Singleton):
+
     def __init__(
         self,
-        ufiles_base_url: str = os.getenv("UFILES_URL", "https://media.pixiee.io/v1/f"),
         *,
+        ufiles_base_url: str = os.getenv("UFILES_URL", "https://media.pixiee.io/v1/f"),
         usso_base_url: str | None = os.getenv("USSO_URL"),
         api_key: str | None = os.getenv("UFILES_API_KEY"),
         usso_refresh_url: str | None = os.getenv("USSO_REFRESH_URL"),
         refresh_token: str | None = os.getenv("USSO_REFRESH_TOKEN"),
+        client: UssoSession | None = None,
     ):
         UssoSession.__init__(
             self,
@@ -25,6 +27,7 @@ class UFiles(UssoSession, metaclass=singleton.Singleton):
             api_key=api_key,
             usso_refresh_url=usso_refresh_url,
             refresh_token=refresh_token,
+            client=client,
         )
         if ufiles_base_url.endswith("/"):
             ufiles_base_url = ufiles_base_url[:-1]
