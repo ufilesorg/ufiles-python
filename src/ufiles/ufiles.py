@@ -33,7 +33,7 @@ class UFiles(UssoSession, metaclass=singleton.Singleton):
         if ufiles_base_url.endswith("/"):
             ufiles_base_url = ufiles_base_url[:-1]
         self.ufiles_base_url = ufiles_base_url
-        self.upload_url = f"{self.ufiles_base_url}/upload"
+        self.upload_url = f"{self.ufiles_base_url}/v1/f/upload"
 
     def upload_file(self, filepath: Path, **kwargs) -> UFileItem:
         if not filepath.exists():
