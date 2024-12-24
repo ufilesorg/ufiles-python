@@ -21,8 +21,7 @@ class AsyncUFiles(AsyncUssoSession, metaclass=singleton.Singleton):
         refresh_token: str | None = os.getenv("USSO_REFRESH_TOKEN"),
         client: AsyncUssoSession | None = None,
     ):
-        AsyncUssoSession.__init__(
-            self,
+        super().__init__(
             usso_base_url=usso_base_url,
             api_key=api_key,
             usso_refresh_url=usso_refresh_url,
