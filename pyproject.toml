@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ufiles"
-version = "0.2.3"
+version = "0.2.4"
 description = "A client for Ufiles."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -32,7 +32,8 @@ dependencies = [
   "requests>=2.26.0",
   "pyjwt[crypto]",
   "usso>=0.27.2",
-  # "singleton_package",
+  "singleton_package",
+  "json-advanced",
   "cachetools",
 ]
 
