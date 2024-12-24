@@ -36,6 +36,8 @@ class AsyncUFiles(AsyncUssoSession, metaclass=singleton.Singleton):
         self.upload_url = f"{self.ufiles_base_url}/v1/f/upload"
 
     async def upload_file(self, filepath: Path, **kwargs) -> UFileItem:
+        if isinstance(filepath, str):
+            filepath = Path(filepath)
         if not filepath.exists():
             raise FileNotFoundError(f"File {filepath} not found")
 
