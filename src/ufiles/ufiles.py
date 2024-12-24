@@ -19,7 +19,7 @@ class UFiles(UssoSession, metaclass=singleton.Singleton):
         api_key: str | None = os.getenv("UFILES_API_KEY"),
         usso_refresh_url: str | None = os.getenv("USSO_REFRESH_URL"),
         refresh_token: str | None = os.getenv("USSO_REFRESH_TOKEN"),
-        client: UssoSession | None = None,
+        client: "UssoSession" | None = None,
     ):
         UssoSession.__init__(
             self,
@@ -29,6 +29,8 @@ class UFiles(UssoSession, metaclass=singleton.Singleton):
             refresh_token=refresh_token,
             client=client,
         )
+        if client and hasattr(client, "ufiles_base_url"):
+            ufiles_base_url = client.ufiles_base_url
         if ufiles_base_url.endswith("/"):
             ufiles_base_url = ufiles_base_url[:-1]
         self.ufiles_base_url = ufiles_base_url
