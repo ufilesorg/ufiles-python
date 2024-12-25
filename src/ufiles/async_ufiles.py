@@ -30,8 +30,8 @@ class AsyncUFiles(AsyncUssoSession, metaclass=singleton.Singleton):
         )
         if client and hasattr(client, "ufiles_base_url"):
             ufiles_base_url = client.ufiles_base_url
-        if ufiles_base_url.endswith("/"):
-            ufiles_base_url = ufiles_base_url[:-1]
+        ufiles_base_url = ufiles_base_url.rstrip("/")
+        ufiles_base_url = ufiles_base_url.rstrip("/v1/f")
         self.ufiles_base_url = ufiles_base_url
         self.upload_url = f"{self.ufiles_base_url}/v1/f/upload"
 
