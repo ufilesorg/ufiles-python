@@ -1,6 +1,7 @@
 import os
 from io import BytesIO
 from pathlib import Path
+from urllib.parse import urlparse
 
 import json_advanced as json
 import singleton
@@ -9,12 +10,12 @@ from usso.session import AsyncUssoSession
 from .schemas import UFileItem
 
 
-class AsyncUFiles(AsyncUssoSession, metaclass=singleton.Singleton):
+class AsyncUFiles(AsyncUssoSession):
 
     def __init__(
         self,
         *,
-        ufiles_base_url: str = os.getenv("UFILES_URL", "https://media.pixiee.io/v1/f"),
+        ufiles_base_url: str = os.getenv("UFILES_URL", "https://media.pixy.ir/v1/f"),
         usso_base_url: str | None = os.getenv("USSO_URL"),
         api_key: str | None = os.getenv("UFILES_API_KEY"),
         usso_refresh_url: str | None = os.getenv("USSO_REFRESH_URL"),
@@ -30,6 +31,22 @@ class AsyncUFiles(AsyncUssoSession, metaclass=singleton.Singleton):
         )
         if client and hasattr(client, "ufiles_base_url"):
             ufiles_base_url = client.ufiles_base_url
+        if usso_base_url is None:
+            # calculate sso_url using ufiles_url
+            # for example: media.pixiee.io/v1/f -> sso.pixiee.io
+            # for example: media.ufaas.io/v1/f -> sso.ufaas.io
+            # for example: media.pixy.ir/api/v1/f -> sso.pixy.ir
+            # for example: storage.pixy.ir/api/v1/f -> sso.pixy.ir
+            parsed_url = urlparse(ufiles_base_url)
+            netloc = parsed_url.netloc
+            netloc_parts = netloc.split(".")
+            if len(netloc_parts) > 2:
+                netloc_parts[0] = "sso"
+            else:
+                netloc_parts = ["sso", netloc]
+            netloc = ".".join(netloc_parts)
+            self.usso_base_url = f"https://{netloc}"
+        
         ufiles_base_url = ufiles_base_url.rstrip("/")
         ufiles_base_url = ufiles_base_url.rstrip("/v1/f")
         self.ufiles_base_url = ufiles_base_url
