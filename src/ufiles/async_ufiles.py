@@ -22,13 +22,6 @@ class AsyncUFiles(AsyncUssoSession):
         refresh_token: str | None = os.getenv("USSO_REFRESH_TOKEN"),
         client: AsyncUssoSession | None = None,
     ):
-        super().__init__(
-            usso_base_url=usso_base_url,
-            api_key=api_key,
-            usso_refresh_url=usso_refresh_url,
-            refresh_token=refresh_token,
-            client=client,
-        )
         if client and hasattr(client, "ufiles_base_url"):
             ufiles_base_url = client.ufiles_base_url
         if usso_base_url is None:
@@ -45,7 +38,15 @@ class AsyncUFiles(AsyncUssoSession):
             else:
                 netloc_parts = ["sso", netloc]
             netloc = ".".join(netloc_parts)
-            self.usso_base_url = f"https://{netloc}"
+            usso_base_url = f"https://{netloc}"
+
+        super().__init__(
+            usso_base_url=usso_base_url,
+            api_key=api_key,
+            usso_refresh_url=usso_refresh_url,
+            refresh_token=refresh_token,
+            client=client,
+        )
         
         ufiles_base_url = ufiles_base_url.rstrip("/")
         ufiles_base_url = ufiles_base_url.rstrip("/v1/f")
