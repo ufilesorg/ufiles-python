@@ -51,7 +51,7 @@ class UFiles(UssoSession):
         ufiles_base_url = ufiles_base_url.rstrip("/")
         ufiles_base_url = ufiles_base_url.rstrip("/v1/f")
         self.ufiles_base_url = ufiles_base_url
-        self.upload_url = f"{self.ufiles_base_url}/v1/f/upload"
+        self.upload_file_url = f"{self.ufiles_base_url}/v1/f/upload"
 
     def upload_file(self, filepath: Path, **kwargs) -> UFileItem:
         if isinstance(filepath, str):
@@ -62,6 +62,21 @@ class UFiles(UssoSession):
         with open(filepath, "rb") as f:
             file_content = BytesIO(f.read())
             return self.upload_bytes(file_content, **kwargs)
+
+    def upload_url(self, url: str, **kwargs) -> UFileItem:
+        if not url.startswith("http"):
+            raise ValueError("URL must start with http or https")
+
+        data = {"url": url}
+        for key, value in kwargs.items():
+            if value is not None:
+                data[key] = value
+
+        response = self.post(
+            f"{self.ufiles_base_url}/v1/f/url", data=data
+        )
+        response.raise_for_status()
+        return UFileItem(**response.json())
 
     def upload_bytes(self, file_bytes: BytesIO, **kwargs) -> UFileItem:
         file_bytes.seek(0)
@@ -75,7 +90,7 @@ class UFiles(UssoSession):
                 data[key] = value
 
         response = self.post(
-            self.upload_url, headers=self.headers, files=files, data=data
+            self.upload_file_url, headers=self.headers, files=files, data=data
         )
         response.raise_for_status()
         return UFileItem(**response.json())

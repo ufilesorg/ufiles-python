@@ -51,7 +51,7 @@ class AsyncUFiles(AsyncUssoSession):
         ufiles_base_url = ufiles_base_url.rstrip("/")
         ufiles_base_url = ufiles_base_url.rstrip("/v1/f")
         self.ufiles_base_url = ufiles_base_url
-        self.upload_url = f"{self.ufiles_base_url}/v1/f/upload"
+        self.upload_file_url = f"{self.ufiles_base_url}/v1/f/upload"
 
     async def upload_file(self, filepath: Path, **kwargs) -> UFileItem:
         if isinstance(filepath, str):
@@ -63,6 +63,21 @@ class AsyncUFiles(AsyncUssoSession):
             file_content = BytesIO(f.read())
             return await self.upload_bytes(file_content, **kwargs)
 
+    async def upload_url(self, url: str, **kwargs) -> UFileItem:
+        if not url.startswith("http"):
+            raise ValueError("URL must start with http or https")
+
+        data = {"url": url}
+        for key, value in kwargs.items():
+            if value is not None:
+                data[key] = value
+
+        response = await self.post(
+            f"{self.ufiles_base_url}/v1/f/url", data=data
+        )
+        response.raise_for_status()
+        return UFileItem(**response.json())
+    
     async def upload_bytes(self, file_bytes: BytesIO, **kwargs) -> UFileItem:
         file_bytes.seek(0)
         files = {"file": (kwargs.get("filename", "file"), file_bytes)}
@@ -75,7 +90,7 @@ class AsyncUFiles(AsyncUssoSession):
                 data[key] = value
 
         response = await self.post(
-            self.upload_url, headers=self.headers, files=files, data=data
+            self.upload_file_url, headers=self.headers, files=files, data=data
         )
         response.raise_for_status()
         return UFileItem(**response.json())
