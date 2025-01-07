@@ -50,9 +50,7 @@ class AsyncUFiles(AsyncUssoSession):
 
         ufiles_base_url = ufiles_base_url.rstrip("/")
         ufiles_base_url = ufiles_base_url.rstrip("/v1/f")
-        self.ufiles_base_url = ufiles_base_url
-        self.base_url = f"{self.ufiles_base_url}/v1/f"
-        self.upload_file_url = f"{self.base_url}/upload"
+        self.base_url = f"{ufiles_base_url}/v1/f"
 
     async def upload_file(self, filepath: Path, **kwargs) -> UFileItem:
         if isinstance(filepath, str):
@@ -71,7 +69,7 @@ class AsyncUFiles(AsyncUssoSession):
         data = {"url": url} | {k: v for k, v in kwargs.items() if v is not None}
 
         response = await self.post(
-            f"{self.ufiles_base_url}/v1/f/url", json=data
+            "url", json=data
         )
         response.raise_for_status()
         return UFileItem(**response.json())
@@ -88,7 +86,7 @@ class AsyncUFiles(AsyncUssoSession):
                 data[key] = value
 
         response = await self.post(
-            self.upload_file_url, headers=self.headers, files=files, data=data
+            "upload", headers=self.headers, files=files, data=data
         )
         response.raise_for_status()
         return UFileItem(**response.json())
@@ -98,7 +96,7 @@ class AsyncUFiles(AsyncUssoSession):
     ) -> list[UFileItem]:
         async def get_page(offset, limit=20):
             params = {"parent_id": parent_id, "offset": offset, "limit": limit}
-            response = await self.get(self.ufiles_base_url, params=params)
+            response = await self.get("", params=params)
             response.raise_for_status()
             return [UFileItem(**item) for item in response.json().get("items")]
 
@@ -114,7 +112,7 @@ class AsyncUFiles(AsyncUssoSession):
         return items
 
     async def delete_file(self, uid: str) -> UFileItem:
-        response = await self.delete(f"{self.ufiles_base_url}/{uid}")
+        response = await self.delete(f"{uid}")
         response.raise_for_status()
         return response.json()
 
@@ -144,7 +142,7 @@ class AsyncUFiles(AsyncUssoSession):
                 data[key] = value
 
         response = await self.put(
-            f"{self.base_url}/{uid}",
+            f"{uid}",
             files=files,
             data=data,
             params={"overwrite": overwrite},
