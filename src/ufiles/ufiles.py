@@ -51,7 +51,8 @@ class UFiles(UssoSession):
         ufiles_base_url = ufiles_base_url.rstrip("/")
         ufiles_base_url = ufiles_base_url.rstrip("/v1/f")
         self.ufiles_base_url = ufiles_base_url
-        self.upload_file_url = f"{self.ufiles_base_url}/v1/f/upload"
+        self.base_url = f"{self.ufiles_base_url}/v1/f"
+        self.upload_file_url = f"{self.base_url}/upload"
 
     def upload_file(self, filepath: Path, **kwargs) -> UFileItem:
         if isinstance(filepath, str):
@@ -68,7 +69,7 @@ class UFiles(UssoSession):
             raise ValueError("URL must start with http or https")
 
         data = {"url": url} | {k: v for k, v in kwargs.items() if v is not None}
-        
+
         response = self.post(
             f"{self.ufiles_base_url}/v1/f/url", json=data
         )
@@ -114,5 +115,30 @@ class UFiles(UssoSession):
 
     def delete_file(self, uid: str) -> UFileItem:
         response = self.delete(f"{self.ufiles_base_url}/{uid}")
+        response.raise_for_status()
+        return response.json()
+
+    def change_file(self, uid: str, filepath: Path, *, overwrite: bool = False, **kwargs) -> UFileItem:
+        if isinstance(filepath, str):
+            filepath = Path(filepath)
+        if not filepath.exists():
+            raise FileNotFoundError(f"File {filepath} not found")
+
+        with open(filepath, "rb") as f:
+            file_content = BytesIO(f.read())
+            return self.change_bytes(uid, file_content, overwrite=overwrite, **kwargs)
+        
+    def change_bytes(self, uid: str, file_bytes: BytesIO, *, overwrite: bool = False, **kwargs) -> UFileItem:
+        file_bytes.seek(0)
+        files = {"file": (kwargs.get("filename", "file"), file_bytes)}
+
+        data = {}
+        for key, value in kwargs.items():
+            if value is not None:
+                if isinstance(value, dict) or isinstance(value, list):
+                    value = json.dumps(value)
+                data[key] = value
+
+        response = self.put(f"{self.base_url}/{uid}", files=files, data=data, params={"overwrite": overwrite})
         response.raise_for_status()
         return response.json()
