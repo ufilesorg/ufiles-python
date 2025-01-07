@@ -67,13 +67,10 @@ class UFiles(UssoSession):
         if not url.startswith("http"):
             raise ValueError("URL must start with http or https")
 
-        data = {"url": url}
-        for key, value in kwargs.items():
-            if value is not None:
-                data[key] = value
-
+        data = {"url": url} | {k: v for k, v in kwargs.items() if v is not None}
+        
         response = self.post(
-            f"{self.ufiles_base_url}/v1/f/url", data=data
+            f"{self.ufiles_base_url}/v1/f/url", json=data
         )
         response.raise_for_status()
         return UFileItem(**response.json())
